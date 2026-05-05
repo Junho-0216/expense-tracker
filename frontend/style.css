@@ -294,6 +294,9 @@ input, button { font-size: 16px; } /* iOS zoom 방지 */
 
 .btn-submit { width: 100%; margin-top: 4px; }
 
+/* hidden 속성 우선: display: flex/grid/block 등에 의해 무력화되는 것 방지 */
+[hidden] { display: none !important; }
+
 /* overlay */
 .overlay {
   position: fixed;
