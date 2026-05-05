@@ -1,0 +1,40 @@
+<!-- 생성: 2026-05-04 -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>비용기록 — 로그인</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <h1 class="auth-title">비용기록</h1>
+    <p class="auth-sub" id="modeSub">이름 3글자 + PIN 4자리로 로그인하세요</p>
+
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab is-active" data-mode="login" role="tab" aria-selected="true" type="button">로그인</button>
+      <button class="auth-tab" data-mode="signup" role="tab" aria-selected="false" type="button">회원가입</button>
+    </div>
+
+    <form id="authForm" class="auth-form" novalidate>
+      <label class="field">
+        <span class="field-label">이름 (한글/영문/숫자 3글자)</span>
+        <input id="nameInput" name="name" type="text" maxlength="3" autocomplete="username"
+               inputmode="text" required placeholder="예: 김수빈" />
+      </label>
+
+      <label class="field">
+        <span class="field-label">PIN (숫자 4자리)</span>
+        <input id="pinInput" name="pin" type="password" inputmode="numeric"
+               pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" required placeholder="••••" />
+      </label>
+
+      <button id="submitBtn" type="submit" class="btn-primary">로그인</button>
+      <p id="errMsg" class="err-msg" role="alert" aria-live="polite"></p>
+    </form>
+  </main>
+
+  <script type="module" src="auth.js"></script>
+</body>
+</html>

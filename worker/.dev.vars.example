@@ -1,0 +1,5 @@
+# 생성: 2026-05-04
+# 로컬 개발용. 실제 값은 `.dev.vars`로 복사하여 채우고 .gitignore로 보호.
+GOOGLE_SA_JSON='{"type":"service_account","project_id":"...","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...@....iam.gserviceaccount.com","client_id":"...","token_uri":"https://oauth2.googleapis.com/token"}'
+SHEET_ID="<TEST_COPY_SHEET_ID>"
+DRIVE_FOLDER_ID="<DRIVE_FOLDER_ID>"

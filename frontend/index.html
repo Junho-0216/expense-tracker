@@ -1,0 +1,101 @@
+<!-- 생성: 2026-05-04 -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>비용기록 제출</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="form-page">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <strong class="brand">비용기록</strong>
+      <div class="who">
+        <span>결제자: <b id="whoName">—</b></span>
+        <button id="logoutBtn" class="btn-link" type="button">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="form-card">
+    <form id="receiptForm" class="form" novalidate>
+      <!-- 1. 영수증 이미지 -->
+      <section class="block">
+        <h2 class="block-title">영수증 이미지</h2>
+        <label id="dropZone" class="dropzone" for="fileInput">
+          <input id="fileInput" type="file" accept="image/*" capture="environment" hidden />
+          <div class="dropzone-inner">
+            <strong>이미지를 끌어다 놓거나 탭하세요</strong>
+            <span class="hint">JPG/PNG/HEIC · 최대 10MB · 모바일은 카메라/갤러리</span>
+          </div>
+          <img id="preview" class="preview" alt="" hidden />
+        </label>
+        <p id="fileMeta" class="meta-line"></p>
+      </section>
+
+      <!-- 2. 동석자 (3섹션) -->
+      <section class="block">
+        <h2 class="block-title">동석자 선택</h2>
+
+        <div class="attendee-section" data-group="통합과학">
+          <button type="button" class="section-header" aria-expanded="true">
+            <span class="caret">▼</span>
+            <span>통합과학 <small id="sciCount"></small></span>
+          </button>
+          <div class="attendee-grid" role="group" aria-label="통합과학" data-grid="통합과학"></div>
+        </div>
+
+        <div class="attendee-section" data-group="통합사회">
+          <button type="button" class="section-header" aria-expanded="true">
+            <span class="caret">▼</span>
+            <span>통합사회 <small id="socCount"></small></span>
+          </button>
+          <div class="attendee-grid" role="group" aria-label="통합사회" data-grid="통합사회"></div>
+        </div>
+
+        <div class="attendee-section">
+          <button type="button" class="section-header" aria-expanded="true">
+            <span class="caret">▼</span>
+            <span>이름 직접 쓰기</span>
+          </button>
+          <div class="attendee-custom">
+            <input id="customInput" type="text" placeholder="콤마로 구분 (예: 거래처 김부장, 외부 강사)" />
+          </div>
+        </div>
+
+        <div id="preview-attendees" class="attendee-preview" aria-live="polite">
+          동석자: <span id="previewText">없음</span>
+        </div>
+      </section>
+
+      <!-- 3. 회의 -->
+      <section class="block">
+        <h2 class="block-title">회의</h2>
+        <div id="meetingRadios" class="meeting-radios"></div>
+        <input id="meetingOther" type="text" placeholder="기타 회의명 입력" hidden />
+      </section>
+
+      <!-- 4. 제출 -->
+      <button id="submitBtn" type="submit" class="btn-primary btn-submit" disabled>제출</button>
+      <p id="errMsg" class="err-msg" role="alert" aria-live="polite"></p>
+
+      <!-- 진행 오버레이 -->
+      <div id="overlay" class="overlay" hidden>
+        <div class="overlay-card">
+          <div class="spinner" aria-hidden="true"></div>
+          <p id="overlayMsg">제출 중…</p>
+        </div>
+      </div>
+    </form>
+
+    <div id="successCard" class="success-card" hidden>
+      <h2>제출되었습니다</h2>
+      <p>영수증 인식은 매주 토요일 자동 처리됩니다.</p>
+      <button id="againBtn" class="btn-primary" type="button">다시 제출</button>
+    </div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

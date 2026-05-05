@@ -1,0 +1,23 @@
+# 생성: 2026-05-04
+name = "expense-tracker"
+main = "src/index.js"
+compatibility_date = "2024-09-25"
+compatibility_flags = ["nodejs_compat"]
+
+# CORS allowlist (배포 후 GitHub Pages URL로 변경)
+[vars]
+CORS_ORIGIN = "https://junho-0216.github.io"
+SHEET_TAB = "설문지 응답 시트1"
+
+# KV: expense-tracker-kv
+# 1) `wrangler kv namespace create expense-tracker-kv` 실행 후 출력된 id로 교체
+# 2) preview는 `wrangler kv namespace create expense-tracker-kv --preview` 실행 후 id로 교체
+[[kv_namespaces]]
+binding = "KV"
+id = "be7c96a9504d4abdbe117f37688e6381"
+preview_id = "376522f6b0b14bbbab6ef9b7da2b2336"
+
+# Secrets (wrangler secret put 으로 등록 — 이 파일에 쓰지 말 것):
+#   GOOGLE_SA_JSON       = Service Account JSON 전체 문자열
+#   SHEET_ID             = 테스트용 시트 ID (Phase 7에서 실 시트로 교체)
+#   DRIVE_FOLDER_ID      = "/비용기록_업로드/" 폴더 ID

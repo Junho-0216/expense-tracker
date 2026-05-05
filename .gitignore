@@ -1,0 +1,51 @@
+# 생성: 2026-05-04
+
+# Secrets
+.env
+.env.local
+.dev.vars
+sa.json
+service_account.json
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+last_auto_run.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Node / Worker
+node_modules/
+.wrangler/
+.miniflare/
+dist/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Temp
+tmp/
+*.tmp
+
+# Sample receipts (실 영수증 이미지)
+tests/sample_receipts/*.jpg
+tests/sample_receipts/*.jpeg
+tests/sample_receipts/*.png
+tests/sample_receipts/*.heic
+tests/sample_receipts/*.heif
+tests/sample_receipts/*.webp
+tests/sample_receipts/_test_ocr_result.json

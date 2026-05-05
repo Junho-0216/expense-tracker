@@ -1,0 +1,78 @@
+/* 생성: 2026-05-04 */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+               "Pretendard", "Noto Sans KR", sans-serif;
+  background: #f9fafb;
+  color: #111827;
+}
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+.topbar-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.meta { color: #6b7280; font-size: 13px; }
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card h2 { margin: 0 0 12px; font-size: 16px; }
+.counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.counts > div {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+.counts .lbl { display: block; color: #6b7280; font-size: 12px; }
+.counts b { font-size: 22px; }
+
+.btn-primary {
+  height: 44px;
+  padding: 0 20px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+}
+.btn-primary:hover:not(:disabled) { background: #1d4ed8; }
+.btn-primary:disabled { background: #c7d2fe; cursor: not-allowed; }
+
+.err { color: #dc2626; min-height: 1.4em; margin-top: 8px; }
+
+.progress { margin-top: 16px; }
+progress {
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.err-list {
+  margin-top: 10px;
+  padding-left: 18px;
+  color: #dc2626;
+  font-size: 13px;
+}
