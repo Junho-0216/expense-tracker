@@ -1,12 +1,14 @@
-// 생성: 2026-05-04
-// Google Drive/Sheets REST 호출 (SA JWT).
-// SDK 미사용 — Cloudflare Workers V8 isolate에서 직접 RS256 서명 후 토큰 교환.
+// 생성: 2026-05-04 / 수정: 2026-05-05 (Drive를 OAuth refresh_token 방식으로 전환)
+// Sheets는 SA JWT, Drive는 Junho 계정 OAuth refresh_token (개인 Drive에 SA가
+// 저장 quota를 가지지 못해 401/403 나는 문제 해결).
 
 const TOKEN_URI = "https://oauth2.googleapis.com/token";
-const SCOPES = "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets";
+const SA_SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-let cachedAccessToken = null;
-let cachedExpiresAt = 0;
+let cachedSAToken = null;
+let cachedSAExpiresAt = 0;
+let cachedOAuthToken = null;
+let cachedOAuthExpiresAt = 0;
 
 function b64urlEncode(bytes) {
   let bin = "";
@@ -34,7 +36,7 @@ async function signJWT(sa) {
   const now = Math.floor(Date.now() / 1000);
   const payload = {
     iss: sa.client_email,
-    scope: SCOPES,
+    scope: SA_SCOPES,
     aud: TOKEN_URI,
     iat: now,
     exp: now + 3600,
@@ -60,9 +62,10 @@ async function signJWT(sa) {
   return `${message}.${sigB64}`;
 }
 
-async function getAccessToken(env) {
-  if (cachedAccessToken && Date.now() < cachedExpiresAt - 60_000) {
-    return cachedAccessToken;
+// SA JWT 기반 access token (Sheets용)
+async function getSAAccessToken(env) {
+  if (cachedSAToken && Date.now() < cachedSAExpiresAt - 60_000) {
+    return cachedSAToken;
   }
   const sa = JSON.parse(env.GOOGLE_SA_JSON);
   const jwt = await signJWT(sa);
@@ -77,17 +80,43 @@ async function getAccessToken(env) {
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Google 토큰 발급 실패 (${res.status}): ${text.slice(0, 300)}`);
+    throw new Error(`SA 토큰 발급 실패 (${res.status}): ${text.slice(0, 300)}`);
   }
   const data = await res.json();
-  cachedAccessToken = data.access_token;
-  cachedExpiresAt = Date.now() + (data.expires_in || 3600) * 1000;
-  return cachedAccessToken;
+  cachedSAToken = data.access_token;
+  cachedSAExpiresAt = Date.now() + (data.expires_in || 3600) * 1000;
+  return cachedSAToken;
+}
+
+// OAuth refresh_token 기반 access token (Drive용 — Junho 계정)
+async function getOAuthAccessToken(env) {
+  if (cachedOAuthToken && Date.now() < cachedOAuthExpiresAt - 60_000) {
+    return cachedOAuthToken;
+  }
+  const body = new URLSearchParams({
+    client_id: env.OAUTH_CLIENT_ID,
+    client_secret: env.OAUTH_CLIENT_SECRET,
+    refresh_token: env.OAUTH_REFRESH_TOKEN,
+    grant_type: "refresh_token",
+  });
+  const res = await fetch(TOKEN_URI, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`OAuth refresh 실패 (${res.status}): ${text.slice(0, 300)}`);
+  }
+  const data = await res.json();
+  cachedOAuthToken = data.access_token;
+  cachedOAuthExpiresAt = Date.now() + (data.expires_in || 3600) * 1000;
+  return cachedOAuthToken;
 }
 
 // ────────────────── Drive 업로드 ──────────────────
 export async function driveUpload(env, { filename, mimeType, bytes, parentFolderId }) {
-  const accessToken = await getAccessToken(env);
+  const accessToken = await getOAuthAccessToken(env);
 
   // multipart upload
   const boundary = "et_boundary_" + crypto.randomUUID().replace(/-/g, "");
@@ -129,7 +158,7 @@ export async function driveUpload(env, { filename, mimeType, bytes, parentFolder
 // ────────────────── Sheets append ──────────────────
 // values: 2차원 배열. range: "A1" 또는 "Sheet1!A1".
 export async function sheetsAppend(env, sheetId, range, values) {
-  const accessToken = await getAccessToken(env);
+  const accessToken = await getSAAccessToken(env);
   const url =
     `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}` +
     `/values/${encodeURIComponent(range)}:append` +

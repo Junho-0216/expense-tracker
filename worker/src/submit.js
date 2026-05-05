@@ -106,30 +106,30 @@ export async function handleSubmit(request, env, origin, corsHeaders) {
   const meetingValue = meeting === "기타" ? meetingOther : meeting;
   const submittedAtISO = new Date().toISOString();
 
-  // 5) Sheets append: A~P (B/D는 빈 칸; OCR 후 admin이 채움)
-  // 헤더 제외 데이터 행, 16개 열 (A..P).
+  // 5) Sheets append: B~Q (실 시트 헤더가 B부터 시작 — A 비어있음)
+  // 16개 열 (B..Q). B/D는 OCR 후 admin이 채움. N/O/P/Q는 자동 메타 (M의 "2열" 헤더 다음 칸들)
   const row = [
-    "", // A
     "", // B (결제일시 — OCR 후)
     "", // C
-    "", // D (업체명 — OCR 후)
+    "", // D (업체명/품목 — OCR 후)
     name, // E (결제자)
     "", // F
     "", // G
-    attendee, // H
-    link, // I
-    meetingValue, // J
+    attendee, // H (동석자)
+    link, // I (Drive 링크)
+    meetingValue, // J (회의/설명)
     "", // K
     "", // L
-    "pending", // M
-    fileId, // N
-    "", // O
-    submittedAtISO, // P
+    "", // M
+    "pending", // N (상태)
+    fileId, // O (파일 ID)
+    "", // P (에러)
+    submittedAtISO, // Q (제출시각)
   ];
 
   const tab = env.SHEET_TAB || "Sheet1";
   // 시트 탭 이름에 한글이 들어가면 작은따옴표 권장
-  const range = `'${tab}'!A:P`;
+  const range = `'${tab}'!B:Q`;
   await sheetsAppend(env, env.SHEET_ID, range, [row]);
 
   return json({ ok: true });

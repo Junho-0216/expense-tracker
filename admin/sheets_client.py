@@ -13,16 +13,17 @@ from googleapiclient.discovery import build
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # 컬럼 인덱스 (0-based, A=0)
-COL_DATE = 1   # B
-COL_VENDOR = 3 # D
-COL_PAYER = 4  # E
-COL_ATTENDEE = 7  # H
-COL_LINK = 8   # I
-COL_MEETING = 9  # J
-COL_STATUS = 12  # M
-COL_FILE_ID = 13  # N
-COL_ERROR = 14  # O
-COL_SUBMITTED = 15  # P
+# 실 시트 헤더가 B부터 시작 (A 비어있음). 메타 컬럼은 N-Q에 위치.
+COL_DATE = 1   # B (결제 날짜)
+COL_VENDOR = 3 # D (품목)
+COL_PAYER = 4  # E (결제자)
+COL_ATTENDEE = 7  # H (이니셜)
+COL_LINK = 8   # I (결제내역)
+COL_MEETING = 9  # J (설명)
+COL_STATUS = 13  # N (상태 — M="2열" 다음 빈 칸)
+COL_FILE_ID = 14  # O (파일 ID)
+COL_ERROR = 15  # P (에러)
+COL_SUBMITTED = 16  # Q (제출시각)
 
 
 @dataclass
@@ -51,13 +52,13 @@ class SheetsClient:
         return f"'{self.tab}'!{a1}"
 
     def get_pending_rows(self) -> List[PendingRow]:
-        """헤더는 1행. 데이터는 2행부터. M='pending' 만 반환, P 오름차순."""
+        """헤더는 1행. 데이터는 2행부터. N='pending' 만 반환, Q 오름차순."""
         result = (
             self.svc.spreadsheets()
             .values()
             .get(
                 spreadsheetId=self.sheet_id,
-                range=self._range("A2:P"),
+                range=self._range("A2:Q"),
                 valueRenderOption="UNFORMATTED_VALUE",
             )
             .execute()
@@ -66,7 +67,7 @@ class SheetsClient:
         rows: List[PendingRow] = []
         for offset, row in enumerate(values):
             row_idx = offset + 2  # 시트 1-based, 헤더 제외 시작
-            row = list(row) + [""] * (16 - len(row))
+            row = list(row) + [""] * (17 - len(row))
             status = (row[COL_STATUS] or "").strip()
             if status != "pending":
                 continue
@@ -79,18 +80,18 @@ class SheetsClient:
                     submitted_at=str(row[COL_SUBMITTED] or "").strip(),
                 )
             )
-        # P 오름차순 (제출 시각)
+        # Q 오름차순 (제출 시각)
         rows.sort(key=lambda r: r.submitted_at or "")
         return rows
 
     def count_by_status(self) -> dict:
-        """M열 status 카운트."""
+        """N열 status 카운트."""
         result = (
             self.svc.spreadsheets()
             .values()
             .get(
                 spreadsheetId=self.sheet_id,
-                range=self._range("M2:M"),
+                range=self._range("N2:N"),
             )
             .execute()
         )
@@ -113,16 +114,16 @@ class SheetsClient:
         status: str | None = None,
         error: str | None = None,
     ) -> None:
-        """B/D/M/O 셀만 선택적으로 업데이트. batchUpdate."""
+        """B/D/N/P 셀만 선택적으로 업데이트. batchUpdate."""
         data = []
         if date is not None:
             data.append({"range": self._range(f"B{row_idx}"), "values": [[date]]})
         if vendor is not None:
             data.append({"range": self._range(f"D{row_idx}"), "values": [[vendor]]})
         if status is not None:
-            data.append({"range": self._range(f"M{row_idx}"), "values": [[status]]})
+            data.append({"range": self._range(f"N{row_idx}"), "values": [[status]]})
         if error is not None:
-            data.append({"range": self._range(f"O{row_idx}"), "values": [[error]]})
+            data.append({"range": self._range(f"P{row_idx}"), "values": [[error]]})
         if not data:
             return
         self.svc.spreadsheets().values().batchUpdate(
